@@ -1,0 +1,106 @@
+*{
+    margin: 1rem;
+    background: none;
+}
+
+
+body{
+    align-items: center;
+    background-color: black;
+}
+
+.container{
+    max-width: max-content;
+    background-color: rgb(235, 235, 235);
+    padding: 1rem;
+    /*border: solid;*/
+    display: flex;
+    justify-content: center;
+    border-left: 5px solid violet;
+    border-radius: 2px 40px 2px 40px;
+    margin-top: 10%;
+}
+
+
+
+.listaGral{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: antiquewhite;
+    border-radius: 2px 40px 2px 40px;
+    border: 1px solid grey;
+    border-left: 5px solid orange;
+    box-shadow: 5px 5px 5px 5px grey;
+    
+}
+
+.listaNombres{
+    width: 20%;    
+}
+
+
+#formularios, #lista{
+    /*border: solid;*/
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+
+#texto-agregar, #texto-editar{
+    /*border: solid;*/
+    display: flex;
+
+}
+
+#btn-agregar, #btn-editar{
+    /*border: solid;*/
+    display: flex;
+    justify-content: center;
+}
+
+#form-agregar, #form-editar{
+    background-color: rgb(235, 235, 235);
+    width: 30%;
+    /*border: solid;*/
+    border-radius: 2px 40px 2px 40px;
+    border-left: 5px solid green;
+}
+
+#form-editar{
+    border-left: 5px solid blue;
+}
+
+#header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 20%;
+    margin: 0;
+    width: 100%;
+    background-color: tomato;
+    justify-content: center;
+    align-items: center;
+
+}
+
+footer{
+    margin: 0;
+    width: 100% ;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    background-color: tomato;
+}
+
+h3{
+    color: black;
+    font-size: 3em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, Geneva, Tahoma, sans-serif;
+}
+
+li{
+    list-style-type: none;
+}
