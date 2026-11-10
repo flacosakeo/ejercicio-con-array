@@ -1,103 +1,152 @@
-let personas = ["eduardo lazarte","ramiro Lazarte","ivan lazarte","patricia almaraz"];
-//let personas = [];
+// Estado de la aplicación
+let personas = ["Eduardo Lazarte", "Ramiro Lazarte", "Iván Lazarte", "Patricia Almaraz"];
+let personaParaModificar = null;
 
-function mostrarPersonas(){
-    event.preventDefault();
-    let lista = document.getElementById('personas');
-    lista.innerHTML = '';
+// Elementos del DOM
+const formAgregar = document.getElementById('form-agregar');
+const formEditar = document.getElementById('form-editar');
+const cardAgregar = document.getElementById('card-agregar');
+const cardEditar = document.getElementById('card-editar');
+const inputNuevaPersona = document.getElementById('nuevaPersona');
+const inputEditarPersona = document.getElementById('editarPersona');
+const btnCancelar = document.getElementById('btnCancelar');
+const listaPersonas = document.getElementById('personas');
+const contadorPersonas = document.getElementById('contador-personas');
+
+/**
+ * Renderiza la lista de personas en el DOM.
+ */
+function mostrarPersonas() {
+    listaPersonas.innerHTML = '';
+    contadorPersonas.textContent = personas.length;
+
+    if (personas.length === 0) {
+        const itemVacio = document.createElement('li');
+        itemVacio.className = 'text-center text-muted py-4 fst-italic';
+        itemVacio.innerHTML = '<i class="bi bi-inbox fs-2 d-block mb-2"></i>No hay personas en la lista.';
+        listaPersonas.appendChild(itemVacio);
+        return;
+    }
+
     personas.forEach((persona, index) => {
-        console.log(persona, index);
-        let li = document.createElement('li');
-        let btnEliminar = document.createElement('button');
-        let btnEditar = document.createElement('button');
-        let divGral = document.createElement('div');
-        let divNombres = document.createElement('div');
-        let divBotones = document.createElement('div');
-        divNombres.classList.add('listaNombres');
-        divBotones.classList.add('listaBotones');
-        divGral.classList.add('listaGral')
-        //btnEliminar.setAttribute = ('data-index', index);
+        const item = document.createElement('li');
+        item.className = 'persona-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-3 rounded-3 border';
 
-        btnEliminar.type = 'button';
-        btnEliminar.classList.add('btn','btn-danger','m-2');
-        btnEliminar.id = 'delete';
-        btnEliminar.innerHTML = 'Eliminar';
-        //btnEditar.setAttribute = ('data-index', index);
+        // Nombre de la persona (seguro contra XSS)
+        const divNombre = document.createElement('div');
+        divNombre.className = 'persona-nombre fw-semibold text-break mb-2 mb-sm-0';
+        divNombre.textContent = persona;
+
+        // Botones de acción
+        const divBotones = document.createElement('div');
+        divBotones.className = 'd-flex gap-2 justify-content-end';
+
+        // Botón Editar
+        const btnEditar = document.createElement('button');
         btnEditar.type = 'button';
-        btnEditar.classList.add('btn','btn-primary','m-2');
-        btnEditar.id = 'edit';
-        btnEditar.innerHTML = 'Editar';
-        li.innerHTML = persona;
-        
-        divNombres.appendChild(li);
-        divBotones.appendChild(btnEliminar);
-        divBotones.appendChild(btnEditar);
-        divGral.appendChild(divNombres);
-        divGral.appendChild(divBotones);
-        lista.appendChild(divGral)
+        btnEditar.className = 'btn btn-outline-primary btn-sm d-flex align-items-center gap-1';
+        btnEditar.innerHTML = '<i class="bi bi-pencil"></i> <span>Editar</span>';
+        btnEditar.addEventListener('click', () => mostrarFormEditar(index));
 
-        btnEliminar.addEventListener('click', ()=>{
-            let result = confirm("Confirmación: ¿Desea eliminar este Usuario?")
-            if (result){
+        // Botón Eliminar
+        const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
+        btnEliminar.className = 'btn btn-outline-danger btn-sm d-flex align-items-center gap-1';
+        btnEliminar.innerHTML = '<i class="bi bi-trash3"></i> <span>Eliminar</span>';
+        btnEliminar.addEventListener('click', () => {
+            if (confirm(`¿Estás seguro de que deseas eliminar a "${persona}"?`)) {
                 eliminarPersona(index);
             }
         });
-        btnEditar.addEventListener('click', ()=>{
-            cancelar();
-            mostrarFormEditar(index);
-        });
-    });
-};
 
-function eliminarPersona(index){
+        divBotones.appendChild(btnEditar);
+        divBotones.appendChild(btnEliminar);
+
+        item.appendChild(divNombre);
+        item.appendChild(divBotones);
+        listaPersonas.appendChild(item);
+    });
+}
+
+/**
+ * Agrega una nueva persona a la lista.
+ */
+function agregarPersona(e) {
+    e.preventDefault();
+    const nombre = inputNuevaPersona.value.trim();
+
+    if (nombre.length > 0) {
+        personas.push(nombre);
+        inputNuevaPersona.value = '';
+        inputNuevaPersona.focus();
+        mostrarPersonas();
+    } else {
+        alert('Por favor ingresa un nombre válido.');
+        inputNuevaPersona.focus();
+    }
+}
+
+/**
+ * Elimina una persona por su índice.
+ */
+function eliminarPersona(index) {
+    // Si estábamos editando a la persona que se acaba de eliminar, cancelar edición
+    if (personaParaModificar === index) {
+        cancelarEdicion();
+    } else if (personaParaModificar !== null && personaParaModificar > index) {
+        // Ajustar el índice si se eliminó un elemento previo
+        personaParaModificar--;
+    }
+
     personas.splice(index, 1);
     mostrarPersonas();
 }
 
-function agregarPersona(){
-    event.preventDefault();
-    let nuevaPersona = document.getElementById('nuevaPersona').value;
-    if (nuevaPersona) {
-        personas.push(nuevaPersona);
-        document.getElementById('nuevaPersona').value = '';
-        document.getElementById('nuevaPersona').focus();
-        mostrarPersonas();
-    }else{
-        alert('Aviso: Campo vacio.');
-    }
-}
-
-function mostrarFormEditar(index){
-    event.preventDefault();
+/**
+ * Muestra el formulario de edición con los datos correspondientes.
+ */
+function mostrarFormEditar(index) {
     personaParaModificar = index;
-    document.getElementById('form-agregar').toggleAttribute('hidden')
-    document.getElementById('form-editar').removeAttribute('hidden')
-    //document.getElementById('form-agregar').style.display = 'none';
-    //document.getElementById('form-editar').style.display = 'block';
-    personaModificada = document.getElementById('editarPersona').value = personas[personaParaModificar];
+    inputEditarPersona.value = personas[index];
+
+    cardAgregar.hidden = true;
+    cardEditar.hidden = false;
+
+    inputEditarPersona.focus();
+    inputEditarPersona.select();
 }
 
+/**
+ * Guarda los cambios realizados en una persona.
+ */
+function modificarPersona(e) {
+    e.preventDefault();
+    const nombreModificado = inputEditarPersona.value.trim();
 
-
-function modificarPersona(){
-    event.preventDefault();
-    let personaModificada = document.getElementById('editarPersona').value;
-    if (personaModificada && personaParaModificar !== null){  
-        personas[personaParaModificar] = personaModificada;
-        cancelar();
+    if (nombreModificado.length > 0 && personaParaModificar !== null) {
+        personas[personaParaModificar] = nombreModificado;
+        cancelarEdicion();
         mostrarPersonas();
-    }else{
-        alert('Nada para Modificar');
+    } else {
+        alert('Por favor, ingresa un nombre válido para guardar.');
+        inputEditarPersona.focus();
     }
 }
 
-function cancelar(){
-    event.preventDefault();
-    document.getElementById('form-editar').toggleAttribute('hidden')
-    document.getElementById('form-agregar').removeAttribute('hidden')
-    //document.getElementById('form-agregar').style.display = 'block';
-    //document.getElementById('form-editar').style.display = 'none';
+/**
+ * Cancela el proceso de edición y restaura la vista inicial.
+ */
+function cancelarEdicion() {
+    personaParaModificar = null;
+    inputEditarPersona.value = '';
+    cardEditar.hidden = true;
+    cardAgregar.hidden = false;
 }
 
-document.getElementById('form-agregar').addEventListener('submit', agregarPersona);
-document.getElementById('form-editar').addEventListener('submit', modificarPersona);
+// Event Listeners
+formAgregar.addEventListener('submit', agregarPersona);
+formEditar.addEventListener('submit', modificarPersona);
+btnCancelar.addEventListener('click', cancelarEdicion);
+
+// Inicialización de la vista al cargar el DOM
+document.addEventListener('DOMContentLoaded', mostrarPersonas);
